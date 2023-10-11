@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="app_name">wedding</string>
+<string name="facebook_app_id">6696971870349119</string>
+<string name="fb_login_protocol_scheme">fb6696971870349119</string>
+<string name="facebook_client_token">32efd627b0e7eb9dc714855e6a964668</string>
+</resources>
