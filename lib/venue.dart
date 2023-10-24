@@ -29,51 +29,42 @@ class _VenueState extends State<Venue> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      // Navigation Small Boxes
+
                       SmallBox(
-                        child: Image.asset(
-                          'assets/venue.png',
-                          height: 25,
-                        ),
+                        image: 'assets/venue.png',
                         onPressed: () {
                           Navigator.popAndPushNamed(context, '/venue');
                         },
+                        isOnVenuePage: true,
                       ),
+
                       SmallBox(
-                        child: Image.asset(
-                          'assets/food.png',
-                          height: 25,
-                        ),
+                        image: 'assets/food.png',
                         onPressed: () {
                           Navigator.pushNamed(context, 'food');
                         },
+                        isOnVenuePage: false,
                       ),
                       SmallBox(
-                        child: Image.asset(
-                          'assets/model.png',
-                          height: 25,
-                        ),
+                        image: 'assets/model.png',
                         onPressed: () {
                           Navigator.pushNamed(context, 'model');
                         },
+                        isOnVenuePage: false,
                       ),
                       SmallBox(
-                        child: Image.asset(
-                          'assets/gallery.png',
-                          height: 25,
-                        ),
+                        image: 'assets/gallery.png',
                         onPressed: () {
                           Navigator.pushNamed(context, '/gallery');
                         },
+                        isOnVenuePage: false,
                       ),
                       SmallBox(
-                        child: Image.asset(
-                          'assets/bill.png',
-                          height: 25,
-                        ),
+                        image: 'assets/bill.png',
                         onPressed: () {
                           Navigator.pushNamed(context, '/bill');
                         },
+                        isOnVenuePage: false,
                       ),
                     ],
                   ),
@@ -186,11 +177,12 @@ class AdvancedSearchBar extends StatelessWidget {
 }
 
 class SmallBox extends StatefulWidget {
-  const SmallBox({Key? key, required this.child, required this.onPressed})
+  const SmallBox({Key? key, required this.image, required this.onPressed, required this.isOnVenuePage})
       : super(key: key);
 
-  final Widget child;
+  final String image;
   final VoidCallback onPressed;
+  final bool isOnVenuePage; // Add a variable to track whether the user is on the Model page
 
   @override
   _SmallBoxState createState() => _SmallBoxState();
@@ -206,14 +198,15 @@ class _SmallBoxState extends State<SmallBox> {
         setState(() {
           isClicked = !isClicked;
         });
-        widget
-            .onPressed(); // Call the onPressed callback when the box is clicked
+        widget.onPressed(); // Call the onPressed callback when the box is clicked
       },
       child: Container(
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: isClicked ? const Color(0xFF8D5765) : const Color(0xFFF9F0F0),
+          color: widget.isOnVenuePage
+              ? const Color(0xFF8D5765).withOpacity(isClicked ? 0.8 : 1.0) // Change the background color when on Model page
+              : const Color(0xFFF9F0F0).withOpacity(isClicked ? 0.8 : 1.0),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: Colors.transparent,
@@ -228,7 +221,14 @@ class _SmallBoxState extends State<SmallBox> {
             ),
           ],
         ),
-        child: Center(child: widget.child),
+        child: Center(
+          child: Image.asset(
+            widget.image,
+            width: 25, // Set the width of the image
+            height: 25, // Set the height of the image
+            color: widget.isOnVenuePage ? const Color(0xFFF9F0F0) : null,
+          ),
+        ),
       ),
     );
   }

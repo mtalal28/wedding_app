@@ -29,50 +29,43 @@ class _GalleryState extends State<Gallery> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+
                       SmallBox(
-                        child: Image.asset(
-                          'assets/venue.png',
-                          height: 25,
-                        ),
+                        image: 'assets/venue.png',
                         onPressed: () {
                           Navigator.pushNamed(context, '/venue');
                         },
+                        isOnGalleryPage: false,
                       ),
+
+
                       SmallBox(
-                        child: Image.asset(
-                          'assets/food.png',
-                          height: 25,
-                        ),
+                        image: 'assets/food.png',
                         onPressed: () {
                           Navigator.pushNamed(context, 'food');
                         },
+                        isOnGalleryPage: false,
                       ),
                       SmallBox(
-                        child: Image.asset(
-                          'assets/model.png',
-                          height: 25,
-                        ),
+                        image: 'assets/model.png',
                         onPressed: () {
                           Navigator.pushNamed(context, 'model');
                         },
+                        isOnGalleryPage: false,
                       ),
                       SmallBox(
-                        child: Image.asset(
-                          'assets/gallery.png',
-                          height: 25,
-                        ),
+                        image: 'assets/gallery.png',
                         onPressed: () {
                           Navigator.popAndPushNamed(context, '/gallery');
                         },
+                        isOnGalleryPage: true,
                       ),
                       SmallBox(
-                        child: Image.asset(
-                          'assets/bill.png',
-                          height: 25,
-                        ),
+                        image: 'assets/bill.png',
                         onPressed: () {
                           Navigator.pushNamed(context, '/bill');
                         },
+                        isOnGalleryPage: false,
                       ),
                     ],
                   ),
@@ -174,11 +167,12 @@ class AdvancedSearchBar extends StatelessWidget {
 }
 
 class SmallBox extends StatefulWidget {
-  const SmallBox({Key? key, required this.child, required this.onPressed})
+  const SmallBox({Key? key, required this.image, required this.onPressed, required this.isOnGalleryPage})
       : super(key: key);
 
-  final Widget child;
+  final String image;
   final VoidCallback onPressed;
+  final bool isOnGalleryPage; // Add a variable to track whether the user is on the Model page
 
   @override
   _SmallBoxState createState() => _SmallBoxState();
@@ -194,14 +188,15 @@ class _SmallBoxState extends State<SmallBox> {
         setState(() {
           isClicked = !isClicked;
         });
-        widget
-            .onPressed(); // Call the onPressed callback when the box is clicked
+        widget.onPressed(); // Call the onPressed callback when the box is clicked
       },
       child: Container(
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: isClicked ? const Color(0xFF8D5765) : const Color(0xFFF9F0F0),
+          color: widget.isOnGalleryPage
+              ? const Color(0xFF8D5765).withOpacity(isClicked ? 0.8 : 1.0) // Change the background color when on Model page
+              : const Color(0xFFF9F0F0).withOpacity(isClicked ? 0.8 : 1.0),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: Colors.transparent,
@@ -216,15 +211,29 @@ class _SmallBoxState extends State<SmallBox> {
             ),
           ],
         ),
-        child: Center(child: widget.child),
+        child: Center(
+          child: Image.asset(
+            widget.image,
+            width: 25, // Set the width of the image
+            height: 25, // Set the height of the image
+            color: widget.isOnGalleryPage ? const Color(0xFFF9F0F0) : null,
+          ),
+        ),
       ),
     );
   }
 }
 
 
-class BigBox extends StatelessWidget {
-  const BigBox({super.key});
+class BigBox extends StatefulWidget {
+  const BigBox({Key? key}) : super(key: key);
+
+  @override
+  _BigBoxState createState() => _BigBoxState();
+}
+
+class _BigBoxState extends State<BigBox> {
+  int selectedPackageIndex = -1; // Initialize with -1 to represent no selection
 
   @override
   Widget build(BuildContext context) {
@@ -286,51 +295,102 @@ class BigBox extends StatelessWidget {
             ),
             const SizedBox(width: 20),
             // Right side - Package no and text about photography
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 15),
-                    child: Text(
-                      'Package No: 1',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF8D5765),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedPackageIndex = 1; // Update with the actual package index
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: selectedPackageIndex == 1
+                            ? Colors.grey.withOpacity(0.5) // Light grey when selected
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Package No: 1',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF8D5765),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 5),
-                  Text(
+                  const SizedBox(height: 5),
+                  const Text(
                     'Six-hour session, 350 albums credits 5x7 print, Online Gallery, Pro Photo Editing, Online Proofing Extra Discs & Images',
                     style: TextStyle(fontSize: 12),
                   ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Package No: 2',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8D5765),
+                  const SizedBox(height: 5),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedPackageIndex = 2; // Update with the actual package index
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: selectedPackageIndex == 2
+                            ? Colors.grey.withOpacity(0.5) // Light grey when selected
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Package No: 2',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF8D5765),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  SizedBox(height: 5),
-                  Text(
+                  const SizedBox(height: 5),
+                  const Text(
                     'Six-hour session, 350 albums credits 5x7 print, Online Gallery, Pro Photo Editing, Online Proofing Extra Discs & Images',
                     style: TextStyle(fontSize: 12),
                   ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Package No: 3',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8D5765),
+                  const SizedBox(height: 5),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedPackageIndex = 3; // Update with the actual package index
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: selectedPackageIndex == 3
+                            ? Colors.grey.withOpacity(0.5) // Light grey when selected
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Package No: 3',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF8D5765),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  SizedBox(height: 5),
-                  Text(
+                  const SizedBox(height: 5),
+                  const Text(
                     'Six-hour session, 350 albums credits 5x7 print, Online Gallery, Pro Photo Editing, Online Proofing Extra Discs & Images',
                     style: TextStyle(fontSize: 12),
                   ),
@@ -343,7 +403,6 @@ class BigBox extends StatelessWidget {
     );
   }
 }
-
 class AdditionalBox extends StatelessWidget {
   const AdditionalBox({Key? key}) : super(key: key);
 

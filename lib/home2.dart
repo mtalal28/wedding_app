@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,10 +8,24 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   Future<void> logout() async {
-    final GoogleSignIn googleSign = GoogleSignIn();
-    await googleSign.signOut();
-  }
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final FirebaseAuth auth = FirebaseAuth.instance;
 
+    try {
+      if (await googleSignIn.isSignedIn()) {
+        await googleSignIn.signOut();
+      }
+
+      if (auth.currentUser != null) {
+        await auth.signOut();
+      }
+
+      // Handle additional logout logic for other providers (Facebook, etc.)
+
+    } catch (e) {
+      print("Error during logout: $e");
+    }
+  }
 
 
   @override
@@ -89,17 +104,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+
                               ListTile(
                                 title: Container(
-
-                                  decoration: const BoxDecoration(
-                                  // Background color for the text
-
-                                  ),
+                                  decoration: const BoxDecoration(),
                                   child: const Padding(
-                                    padding: EdgeInsets.only(
-                                      left: 150,
-                                    ),
+                                    padding: EdgeInsets.only(left: 150),
                                     child: Text(
                                       'Logout',
                                       style: TextStyle(
@@ -110,12 +120,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                     ),
                                   ),
                                 ),
-                                onTap: () {
+                                onTap: () async {
                                   // Implement logout logic here
-                                  // For example, clear user session and navigate to login
+                                  await widget.logout(); // Call the logout function from the widget
                                   Navigator.pushReplacementNamed(context, 'login');
                                 },
                               ),
+
 
                             ],
                           ),

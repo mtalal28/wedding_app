@@ -4,6 +4,7 @@
 
 // TODO Implement this library.
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,7 +22,7 @@ class AuthService {
     }
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['https://www.googleapis.com/auth/drive']);
 
@@ -30,7 +31,7 @@ class AuthService {
       if (googleUser != null) {
         final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-        final AuthCredential credential = GoogleAuthProvider.credential(
+        final AuthCredential credential = await GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
@@ -78,6 +79,15 @@ class AuthService {
     }
 
     return null;
+  }
+
+  Future<UserCredential?> signInWithCredential(AuthCredential credential) async {
+    try {
+      return await _auth.signInWithCredential(credential);
+    } catch (error) {
+      print("Sign-In with Credential Error: $error");
+      return null;
+    }
   }
 
 }

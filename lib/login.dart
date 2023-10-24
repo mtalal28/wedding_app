@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'home2.dart';
+// import 'home2.dart';h
 import 'path_to_auth_service/auth_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -17,58 +17,32 @@ class MyLogin extends StatefulWidget {
 
 class _MyLoginState extends State<MyLogin> {
   final AuthService _authService = AuthService();
-  bool _isGoogleSignInPopupOpen = false;
+  final bool _isGoogleSignInPopupOpen = false;
   bool _rememberMe = false;
 
 
-  Future<void> googleSignIn() async {
-    try {
-      if (_isGoogleSignInPopupOpen) {
-        return;
-      }
-      _isGoogleSignInPopupOpen = true;
 
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['https://www.googleapis.com/auth/drive']);
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
       if (googleUser != null) {
         final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-        final AuthCredential credential = await GoogleAuthProvider.credential(
+        final AuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
 
-        // Use signInWithCredential
-        UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-
-        if (userCredential.user != null) {
-          // Only navigate to the next page if Google login is successful
-          if (kDebugMode) {
-            print("User signed in with Google: ${userCredential.user?.displayName}");
-          }
-          if (kDebugMode) {
-            print("Navigating to the next page...");
-          }
-          Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const MyHomePage(),
-              ));
-        } else {
-          if (kDebugMode) {
-            print("Google Sign-In Failed");
-          }
-        }
+        // Use Navigator to push the next page only if sign-in is successful
+        await _authService.signInWithCredential(credential);
       } else {
-        if (kDebugMode) {
-          print("Google Sign-In Cancelled");
-        }
+        print("Google Sign-In Cancelled");
       }
     } catch (error) {
-      if (kDebugMode) {
-        print("Google Sign-In Error: $error");
-      }
-    } finally {
-      _isGoogleSignInPopupOpen = false;
+      print("Google Sign-In Error: $error");
     }
   }
 
@@ -76,18 +50,27 @@ class _MyLoginState extends State<MyLogin> {
 
 
 
-
   Future<UserCredential?> signInWithFacebook() async {
     try {
-      final LoginResult result = await FacebookAuth.instance.login();
+
+      final LoginResult result = await FacebookAuth.instance.login(
+        permissions: ['email'],
+      );
 
       if (result.status == LoginStatus.success) {
         final AccessToken accessToken = result.accessToken!;
         final OAuthCredential facebookAuthCredential =
         FacebookAuthProvider.credential(accessToken.token);
 
+
+        print('Access Token: ${accessToken.token}');
+
+
+        await FacebookAuth.instance.logOut();
+
         return await FirebaseAuth.instance.signInWithCredential(
-            facebookAuthCredential);
+          facebookAuthCredential,
+        );
       } else {
         print("Facebook Sign-In Cancelled");
         return null; // Return null in case of cancellation
@@ -97,6 +80,8 @@ class _MyLoginState extends State<MyLogin> {
       return null; // Return null in case of an error
     }
   }
+
+
 
 
   String _email = '';
@@ -577,18 +562,14 @@ class _MyLoginState extends State<MyLogin> {
 
                             GestureDetector(
                               onTap: () async {
-                                await googleSignIn();
-                                if (kDebugMode) {
-                                  print('After googleSignIn');
-                                }
-                                if (mounted) {
-                                  if (kDebugMode) {
-                                    print('hey buddy');
-                                  }
+                                UserCredential? signInWithGoogle = await _authService.signInWithGoogle(context);
+                                if (signInWithGoogle != null) {
+                                  // Google login successful, navigate to the home screen
                                   Navigator.pushNamed(context, '/home2');
                                 } else {
+                                  // Handle the case where Google login failed or was cancelled
                                   if (kDebugMode) {
-                                    print('Widget not mounted');
+                                    print('Google login failed or cancelled');
                                   }
                                 }
                               },

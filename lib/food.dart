@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 
-class food extends StatefulWidget {
-  const food({Key? key}) : super(key: key);
+class Food extends StatefulWidget {
+  const Food({Key? key}) : super(key: key);
 
   @override
-  State<food> createState() => _foodState();
+  State<Food> createState() => _FoodState();
 }
 
-class _foodState extends State<food
+class _FoodState extends State<Food
 > {
   DateTime selectedDate = DateTime.now();
+  List<Map<String, dynamic>> selectedItems = [];
+
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
@@ -91,50 +93,43 @@ class _foodState extends State<food
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+
                       SmallBox(
-                        child: Image.asset(
-                          'assets/venue.png',
-                          height: 25,
-                        ),
+                        image: 'assets/venue.png',
                         onPressed: () {
                           Navigator.pushNamed(context, '/venue');
                         },
+                        isOnFoodPage: false,
                       ),
+
+
                       SmallBox(
-                        child: Image.asset(
-                          'assets/food.png',
-                          height: 25,
-                        ),
+                        image: 'assets/food.png',
                         onPressed: () {
                           Navigator.popAndPushNamed(context, 'food');
                         },
+                        isOnFoodPage: true,
                       ),
                       SmallBox(
-                        child: Image.asset(
-                          'assets/model.png',
-                          height: 25,
-                        ),
+                        image: 'assets/model.png',
                         onPressed: () {
                           Navigator.pushNamed(context, 'model');
                         },
+                        isOnFoodPage: false,
                       ),
                       SmallBox(
-                        child: Image.asset(
-                          'assets/gallery.png',
-                          height: 25,
-                        ),
+                        image: 'assets/gallery.png',
                         onPressed: () {
                           Navigator.pushNamed(context, '/gallery');
                         },
+                        isOnFoodPage: false,
                       ),
                       SmallBox(
-                        child: Image.asset(
-                          'assets/bill.png',
-                          height: 25,
-                        ),
+                        image: 'assets/bill.png',
                         onPressed: () {
                           Navigator.pushNamed(context, '/bill');
                         },
+                        isOnFoodPage: false,
                       ),
                     ],
                   ),
@@ -261,8 +256,19 @@ class _foodState extends State<food
               minWidth: double.infinity,
               height: 60,
               onPressed: () {
-                // Handle the Add to Cart button press
+                // Create a map representing the selected food item
+                Map<String, dynamic> selectedItem = {
+                  'name': 'Biryani', // Replace with the actual name of the item
+                  'price': '\$20',   // Replace with the actual price of the item
+                  // Add more details as needed
+                };
+
+                // Add the selected item to the list
+                setState(() {
+                  selectedItems.add(selectedItem);
+                });
               },
+
               shape: RoundedRectangleBorder(
                 side: const BorderSide(
                   color: Color(0xFF8D5765),
@@ -340,10 +346,12 @@ class _foodState extends State<food
 
 
 class SmallBox extends StatefulWidget {
-  const SmallBox({Key? key, required this.child, required this.onPressed}) : super(key: key);
+  const SmallBox({Key? key, required this.image, required this.onPressed, required this.isOnFoodPage})
+      : super(key: key);
 
-  final Widget child;
+  final String image;
   final VoidCallback onPressed;
+  final bool isOnFoodPage; // Add a variable to track whether the user is on the Model page
 
   @override
   _SmallBoxState createState() => _SmallBoxState();
@@ -365,7 +373,9 @@ class _SmallBoxState extends State<SmallBox> {
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: isClicked ? const Color(0xFF8D5765) : const Color(0xFFF9F0F0),
+          color: widget.isOnFoodPage
+              ? Color(0xFF8D5765).withOpacity(isClicked ? 0.8 : 1.0) // Change the background color when on Model page
+              : const Color(0xFFF9F0F0).withOpacity(isClicked ? 0.8 : 1.0),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: Colors.transparent,
@@ -380,7 +390,14 @@ class _SmallBoxState extends State<SmallBox> {
             ),
           ],
         ),
-        child: Center(child: widget.child),
+        child: Center(
+          child: Image.asset(
+            widget.image,
+            width: 25, // Set the width of the image
+            height: 25, // Set the height of the image
+            color: widget.isOnFoodPage ? const Color(0xFFF9F0F0) : null,
+          ),
+        ),
       ),
     );
   }

@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:wedding_app/bill.dart';
@@ -29,7 +29,7 @@ void main() async {
   AuthService _authService = AuthService();
 
   // Attempt auto-login
-  UserCredential? autoLoginResult = await _authService.tryAutoLogin();
+  // UserCredential? autoLoginResult = await _authService.tryAutoLogin();
 
   // Run the app
   runApp(const MyApp());
@@ -51,8 +51,8 @@ class MyApp extends StatelessWidget {
         'login': (context)=> const MyLogin(),
         'forget': (context) => const MyForget(),
         '/home2': (context) =>  const MyHomePage(),
-        'model': (context)=> const model(),
-        'food': (context) =>  const food(),
+        'model': (context)=> const Model(),
+        'food': (context) =>  const Food(),
         '/gallery': (context) =>  const Gallery(),
         '/venue': (context) =>  const Venue(),
         '/bill': (context) =>  const BillPage(),
