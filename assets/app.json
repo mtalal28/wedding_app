@@ -1,0 +1,76 @@
+{
+  "users": {
+    "user_id_123": {
+      "cart": {
+        "-MhYzkYWLJqO0jg34": {
+          "category": "Basic Package ",
+          "name": "nails",
+          "price": 50.0,
+
+          "category": "Basic Package ",
+          "name": "hairs",
+          "price": 50.0,
+
+          "category": "Basic Package ",
+          "name": "Eyes",
+          "price": 50.0
+
+
+
+        },
+        "-MhYzkYWLJqO0jg35": {
+          "category": "Venue",
+          "name": "outdoor",
+          "price": 100.0,
+
+          
+            "category": "Venue",
+            "name": "indoor",
+            "price": 500.0,
+
+            "category": "Venue",
+            "name": "arch",
+            "price": 800.0,
+
+            "category": "Venue",
+            "name": "safari",
+            "price": 1500.0
+
+        },
+        "-MhYzkYWLJqO0jg36": {
+          "category": "Food",
+          "name": "biryani",
+          "price": 12.0,
+
+          "category": "Food",
+          "name": "appetizer",
+          "price": 12.0
+
+        },
+
+        "-MhYzkYWLJqO0jg37": {
+          "category": "gallery",
+          "name": "package 1",
+          "price": 90.0,
+
+          "category": "gallery",
+          "name": "package 2",
+          "price": 80.0,
+
+          "-MhYzkYWLJqO0jg36": {
+            "category": "gallery",
+            "name": "package 3",
+            "price": 70.0
+  
+            
+  
+          }
+
+        }
+
+
+        
+      }
+    }
+  }
+}
