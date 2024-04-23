@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:wedding_app/bill.dart';
 import 'package:wedding_app/food.dart';
 import 'package:wedding_app/gallery.dart';
-import 'package:wedding_app/path_to_auth_service/auth_service.dart';
 import 'package:wedding_app/register.dart';
 import 'package:wedding_app/venue.dart';
 import 'forget.dart';
@@ -19,21 +18,24 @@ import 'login.dart';
 
 
 
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
-  // Create an instance of your AuthService
-  AuthService _authService = AuthService();
-
-  // Attempt auto-login
-  // UserCredential? autoLoginResult = await _authService.tryAutoLogin();
-
-  // Run the app
   runApp(const MyApp());
 }
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp();
+//
+//   // Create an instance of your AuthService
+//
+//   // Attempt auto-login
+//   // UserCredential? autoLoginResult = await _authService.tryAutoLogin();
+//
+//   // Run the app
+//   runApp(const MyApp());
+// }
 
 
 
@@ -51,7 +53,7 @@ class MyApp extends StatelessWidget {
         'login': (context)=> const MyLogin(),
         'forget': (context) => const MyForget(),
         '/home2': (context) =>  const MyHomePage(),
-        'model': (context)=> const Model(),
+        'model': (context)=>  const Model(),
         'food': (context) =>  const Food(),
         '/gallery': (context) =>  const Gallery(),
         '/venue': (context) =>  const Venue(),

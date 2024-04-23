@@ -1,35 +1,41 @@
-import 'dart:convert';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import 'cart.dart';
 import 'firebase.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Model extends StatefulWidget {
   const Model({Key? key}) : super(key: key);
-
   @override
   State<Model> createState() => _ModelState();
 }
 
 class _ModelState extends State<Model> {
   final FirebaseService _firebaseService = FirebaseService();
-  final LocalJsonService jsonService = LocalJsonService();
-  List<Map<String, dynamic>> basicPackages = [
-    {
-      //   'id': 'nails',
-      //   'name': 'Nails',
-      //   'price': 50.0,
-      //   'image': 'assets/nails.png'
-      // },
-      // {'id': 'hair', 'name': 'Hairs', 'price': 50.0, 'image': 'assets/hair.png'},
-      // {'id': 'eye', 'name': 'Eyes', 'price': 50.0, 'image': 'assets/eye.png'},
-    }
+  List<Map<String, dynamic>> basicPackages = [];
+  Map<String, dynamic>? selectedItem;
+  // List<Map<String, dynamic>> basicPackages = [];
 
-  ];
+
+  @override
+  void initState() {
+    super.initState();
+    loadBasicPackages();
+  }
+
+  Future<void> loadBasicPackages() async {
+    Set<String> packageSet = (await _firebaseService.getBasicPackages()).cast<String>().toSet();
+
+
+    // Convert the set to a list of maps (adjust this conversion based on your actual data structure)
+    List<Map<String, dynamic>> packages = packageSet.map((item) => {'id': item, 'name': 'SomeName', 'price': 0.0}).toList();
+
+    setState(() {
+      basicPackages = packages;
+    });
+  }
+
+
 
   List<Map<String, dynamic>> selectedBasicPackages = [];
 
@@ -109,8 +115,13 @@ class _ModelState extends State<Model> {
     setState(() {
       if (selected) {
         // Add the selected package to the list
-        selectedBasicPackages
-            .add(basicPackages.firstWhere((package) => package['id'] == id));
+        var selectedPackage = basicPackages.firstWhere(
+              (package) => package['id'] == id,
+          orElse: () => <String, dynamic>{}, // Return an empty map if not found
+        );
+        if (selectedPackage is Map<String, dynamic>) {
+          selectedBasicPackages.add(selectedPackage);
+        }
       } else {
         // Remove the selected package from the list
         selectedBasicPackages.removeWhere((package) => package['id'] == id);
@@ -118,25 +129,62 @@ class _ModelState extends State<Model> {
     });
   }
 
+
+
+
   // Function to add selected basic packages to the cart
 
-  Future<void> _addToCart() async {
+  Future<void> _addToCart({Map<String, dynamic>? selectedItem}) async {
     try {
-      var cartData = await jsonService.fetchCartFromLocalJson('user_id_123');
-
-      if (cartData != null) {
-        print('Cart Data: $cartData');
-        // Continue with your logic...
-      } else {
-        print('Cart Data is null');
+      if (selectedItem == null || selectedItem.isEmpty) {
+        print('Error in _addToCart: selectedItem is null or empty.');
+        return;
       }
 
+      String? category = selectedItem['category'] as String?;
+      String? id = selectedItem['id'] as String?;
+      String? name = selectedItem['name'] as String?;
+      double? price = (selectedItem['price'] as num?)?.toDouble();
 
+      if (category == null || id == null || name == null || price == null) {
+        print('Error in _addToCart: Invalid or missing fields in selectedItem.');
+        return;
+      }
+
+      // CartItem newItem = CartItem(
+      //   id: id,
+      //   category: category,
+      //   name: name,
+      //   price: price,
+      // );
+
+      setState(() {
+        this.selectedItem = selectedItem;
+      });
+
+      // Add selected item to the cart
+      await FirebaseFirestore.instance
+          .collection('user_carts')
+          .doc('user_id') // Replace 'user_id' with the actual user ID
+          .collection('cart_items')
+          .add({
+        'category': 'some_category',
+        'id': selectedItem, // Use the selected item ID here
+        'name': 'some_name',
+        'price': 0.0,
+      });
+
+      print('Added to cart successfully: $selectedItem');
     } catch (error) {
       print('Error in _addToCart: $error');
       // Handle error as needed
     }
   }
+
+
+
+
+
 
 
 
@@ -149,7 +197,7 @@ class _ModelState extends State<Model> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(top: 50.0),
+            padding: const EdgeInsets.only(top: 50.0),
             child:
                 AdvancedSearchBar(selectedBasicPackages: selectedBasicPackages),
           ),
@@ -285,28 +333,25 @@ class _ModelState extends State<Model> {
                               PackageColumn(
                                 id: 'nails',
                                 image: 'assets/nails.png',
-                                onSelected: (id, selected) {
-                                  // Handle package selection
-                                  handlePackageSelection(id, selected);
-                                },
+                                basicPackages: basicPackages, // Pass the basicPackages list
+                                onSelected: handlePackageSelection,
+                                callAddToCart: _addToCart,
                               ),
                               SizedBox(height: 15),
                               PackageColumn(
                                 id: 'hair',
                                 image: 'assets/hair.png',
-                                onSelected: (id, selected) {
-                                  // Handle package selection
-                                  handlePackageSelection(id, selected);
-                                },
+                                basicPackages: basicPackages, // Pass the basicPackages list
+                                onSelected: handlePackageSelection,
+                                callAddToCart: _addToCart,
                               ),
                               SizedBox(height: 15),
                               PackageColumn(
-                                id: 'eye',
+                                id: 'eyes',
                                 image: 'assets/eye.png',
-                                onSelected: (id, selected) {
-                                  // Handle package selection
-                                  handlePackageSelection(id, selected);
-                                },
+                                basicPackages: basicPackages, // Pass the basicPackages list
+                                onSelected: handlePackageSelection,
+                                callAddToCart: _addToCart,
                               ),
                             ],
                           ),
@@ -443,11 +488,11 @@ class _ModelState extends State<Model> {
                             minWidth: double.infinity,
                             height: 60,
                             onPressed: () {
-                              // Add selected basic packages to the cart
-                              _addToCart();
+                              _addToCart(selectedItem: selectedItem);
                             },
                             shape: RoundedRectangleBorder(
                               side: const BorderSide(
+
                                 color: Color(0xFF8D5765),
                                 width: 1.0,
                               ),
@@ -477,20 +522,20 @@ class _ModelState extends State<Model> {
   }
 }
 
-class LocalJsonService {
-  Future<Map<String, dynamic>?> fetchCartFromLocalJson(String userId) async {
-    try {
-      String jsonString = await rootBundle.loadString('assets/app.json');
-      Map<String, dynamic> userData = jsonDecode(jsonString)['users'][userId];
-      Map<String, dynamic>? cartData = userData?['cart'];
-
-      return cartData;
-    } catch (error) {
-      print('Error fetching data from local JSON: $error');
-      return null;
-    }
-  }
-}
+// class LocalJsonService {
+//   Future<Map<String, dynamic>?> fetchCartFromLocalJson(String userId) async {
+//     try {
+//       String jsonString = await rootBundle.loadString('assets/app.json');
+//       Map<String, dynamic> userData = jsonDecode(jsonString)['users'][userId];
+//       Map<String, dynamic>? cartData = userData?['cart'];
+//
+//       return cartData;
+//     } catch (error) {
+//       print('Error fetching data from local JSON: $error');
+//       return null;
+//     }
+//   }
+// }
 
 
 class CartItem {
@@ -506,13 +551,7 @@ class CartItem {
     required this.price,
   });
 
-  factory CartItem.fromJson(Map<String, dynamic> json) {
-    return CartItem(
-      category: json['category'],
-      name: json['name'],
-      price: json['price'].toDouble(), id: '',
-    );
-  }
+
 }
 
 
@@ -739,6 +778,8 @@ class PackageColumn extends StatefulWidget {
   final String image;
   final bool selected;
   final Function(String, bool) onSelected;
+  final VoidCallback callAddToCart;
+  final List<Map<String, dynamic>> basicPackages; // Remove the duplicated declaration
 
   const PackageColumn({
     Key? key,
@@ -746,13 +787,19 @@ class PackageColumn extends StatefulWidget {
     required this.image,
     this.selected = false,
     required this.onSelected,
+    required this.callAddToCart,
+    required this.basicPackages, // Keep only one declaration
   }) : super(key: key);
 
   @override
-  _PackageColumnState createState() => _PackageColumnState();
+  _PackageColumnState createState() => _PackageColumnState(basicPackages: basicPackages);
 }
 
 class _PackageColumnState extends State<PackageColumn> {
+  final List<Map<String, dynamic>> basicPackages;
+
+  _PackageColumnState({required this.basicPackages});
+
   bool selected = false;
 
   @override
@@ -760,6 +807,60 @@ class _PackageColumnState extends State<PackageColumn> {
     super.initState();
     selected = widget.selected;
   }
+
+  // void _callAddToCart() {
+  //   if (selected) {
+  //     _ModelState modelState = context.findAncestorStateOfType<_ModelState>()!;
+  //     var selectedPackage = basicPackages.firstWhere(
+  //           (package) => package['id'] == widget.id,
+  //         //if<String, addtoselectedpackage >
+  //       orElse: () => <String, Object>{},// Return an empty map if not found
+  //     );
+  //
+  //     if (selectedPackage.isNotEmpty) {
+  //       modelState.selectedBasicPackages.add(selectedPackage);
+  //     }
+  //   }
+  // }
+
+
+  // void _callAddToCart() {
+  //   if (selected) {
+  //     _ModelState modelState = context.findAncestorStateOfType<_ModelState>()!;
+  //     var selectedPackage = basicPackages.firstWhere(
+  //           (package) => package['id'] == widget.id,
+  //       orElse: () => <String, Object>{}, // Return an empty map if not found
+  //     );
+  //
+  //     if (selectedPackage.isNotEmpty) {
+  //       modelState.selectedBasicPackages.add(selectedPackage);
+  //       modelState.addToSelectedItems(
+  //         selectedPackage['name'] as String,
+  //         (selectedPackage['price'] as num).toDouble(),
+  //       );
+  //     }
+  //   }
+  // }
+
+  void _callAddToCart() {
+    if (selected) {
+      _ModelState modelState = context.findAncestorStateOfType<_ModelState>()!;
+      var selectedPackage = basicPackages.firstWhere(
+            (package) => package['id'] == widget.id,
+        orElse: () => <String, Object>{}, // Return an empty map if not found
+
+      );
+
+      if (selectedPackage.isNotEmpty) {
+        modelState.selectedBasicPackages.add(selectedPackage);
+        modelState.addToSelectedItems(
+          selectedPackage['name'] as String,
+          (selectedPackage['price'] as num).toDouble(),
+        );
+      }
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -769,6 +870,7 @@ class _PackageColumnState extends State<PackageColumn> {
           selected = !selected;
         });
         widget.onSelected(widget.id, selected);
+        _callAddToCart();
       },
       child: Container(
         decoration: BoxDecoration(
@@ -846,6 +948,7 @@ class _PackageColumnState extends State<PackageColumn> {
       ),
     );
   }
+
 }
 
 class DottedLinePainter extends CustomPainter {

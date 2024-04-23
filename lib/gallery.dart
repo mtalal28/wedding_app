@@ -238,9 +238,9 @@ class _BigBoxState extends State<BigBox> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(12.0),
       child: Container(
-        height: 340,  // Increased height to provide space at the bottom
+        height: 370,  // Increased height to provide space at the bottom
         decoration: BoxDecoration(
           color: const Color(0xFFF9F0F0),
           borderRadius: BorderRadius.circular(15),
@@ -260,7 +260,7 @@ class _BigBoxState extends State<BigBox> {
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 15, top: 19),
+                  padding: const EdgeInsets.only(left: 15, top: 20),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: Image.asset(
@@ -269,6 +269,7 @@ class _BigBoxState extends State<BigBox> {
                     ),
                   ),
                 ),
+                // _buildDivider(), // Add a divider below Image 1
                 const SizedBox(height: 35),
                 Padding(
                   padding: const EdgeInsets.only(left: 15),
@@ -280,9 +281,10 @@ class _BigBoxState extends State<BigBox> {
                     ),
                   ),
                 ),
+                // _buildDivider(), // Add a divider below Image 2
                 const SizedBox(height: 25),
                 Padding(
-                  padding: const EdgeInsets.only(left: 15),
+                  padding: const EdgeInsets.only(left: 15, top: 20),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: Image.asset(
@@ -293,7 +295,7 @@ class _BigBoxState extends State<BigBox> {
                 ),
               ],
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: 15),
             // Right side - Package no and text about photography
             Expanded(
               child: Column(
@@ -314,22 +316,29 @@ class _BigBoxState extends State<BigBox> {
                       ),
                       child: const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Package No: 1',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF8D5765),
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Package No: 1',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF8D5765),
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Six-hour session, 350 albums credits 5x7 print, Online Gallery, Pro Photo Editing, Online Proofing Extra Discs & Images',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Text(
-                    'Six-hour session, 350 albums credits 5x7 print, Online Gallery, Pro Photo Editing, Online Proofing Extra Discs & Images',
-                    style: TextStyle(fontSize: 12),
-                  ),
+                  _buildDivider(isLast: false), // Add a divider below Package 1
                   const SizedBox(height: 5),
                   GestureDetector(
                     onTap: () {
@@ -346,22 +355,29 @@ class _BigBoxState extends State<BigBox> {
                       ),
                       child: const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Package No: 2',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF8D5765),
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Package No: 2',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF8D5765),
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Six-hour session, 350 albums credits 5x7 print, Online Gallery, Pro Photo Editing, Online Proofing Extra Discs & Images',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Text(
-                    'Six-hour session, 350 albums credits 5x7 print, Online Gallery, Pro Photo Editing, Online Proofing Extra Discs & Images',
-                    style: TextStyle(fontSize: 12),
-                  ),
+                  _buildDivider(isLast: false), // Add a divider below Package 2
                   const SizedBox(height: 5),
                   GestureDetector(
                     onTap: () {
@@ -378,22 +394,28 @@ class _BigBoxState extends State<BigBox> {
                       ),
                       child: const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Package No: 3',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF8D5765),
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Package No: 3',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF8D5765),
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Six-hour session, 350 albums credits 5x7 print, Online Gallery, Pro Photo Editing, Online Proofing Extra Discs & Images',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'Six-hour session, 350 albums credits 5x7 print, Online Gallery, Pro Photo Editing, Online Proofing Extra Discs & Images',
-                    style: TextStyle(fontSize: 12),
-                  ),
+
                 ],
               ),
             ),
@@ -402,7 +424,19 @@ class _BigBoxState extends State<BigBox> {
       ),
     );
   }
+
+  Widget _buildDivider({required bool isLast}) {
+    return Container(
+      height: 1,
+      color: isLast ? Colors.transparent : Colors.grey.withOpacity(0.5),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+    );
+  }
 }
+
+
+
+
 class AdditionalBox extends StatelessWidget {
   const AdditionalBox({Key? key}) : super(key: key);
 
@@ -472,7 +506,7 @@ class AdditionalBox extends StatelessWidget {
                       // Handle Read More button press
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: const Color(0xFF8D5765),
+                      backgroundColor: const Color(0xFF8D5765),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),

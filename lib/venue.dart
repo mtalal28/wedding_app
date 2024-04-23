@@ -8,6 +8,7 @@ class Venue extends StatefulWidget {
 }
 
 class _VenueState extends State<Venue> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +30,6 @@ class _VenueState extends State<Venue> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-
                       SmallBox(
                         image: 'assets/venue.png',
                         onPressed: () {
@@ -37,7 +37,6 @@ class _VenueState extends State<Venue> {
                         },
                         isOnVenuePage: true,
                       ),
-
                       SmallBox(
                         image: 'assets/food.png',
                         onPressed: () {
@@ -68,17 +67,8 @@ class _VenueState extends State<Venue> {
                       ),
                     ],
                   ),
-
-                  // Big Box
                   const BigBox(),
-
-                  // Additional Box
-                  const Padding(
-                    padding: EdgeInsets.only(),
-                    child: AdditionalBox(),
-                  ),
-
-                  // Swipe Section
+                  AdditionalBox(),
                   SwipeSection(),
                   Container(
                     width: 300,
@@ -119,7 +109,6 @@ class _VenueState extends State<Venue> {
 }
 
 
-
 class AdvancedSearchBar extends StatelessWidget {
   const AdvancedSearchBar({Key? key}) : super(key: key);
 
@@ -127,6 +116,7 @@ class AdvancedSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        
         Padding(
           padding: const EdgeInsets.only(left: 50),
           child: Row(
@@ -397,6 +387,8 @@ class AdditionalBox extends StatelessWidget {
   }
 }
 class SwipeSection extends StatelessWidget {
+  const SwipeSection({super.key});
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(

@@ -1,69 +1,49 @@
-import 'dart:convert';
+import 'dart:async';
+
 
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/services.dart' show rootBundle;
+
+
+import 'model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class FirebaseService {
-  final DatabaseReference _database = FirebaseDatabase.instance.ref();
+  late DatabaseReference databaseReference;
 
-  Future<List<Map<String, dynamic>>> fetchPackagesFromJson() async {
-    try {
-      String jsonString = await rootBundle.loadString('assets/app.json');
-      List<Map<String, dynamic>> packages = [];
-
-      final dynamic jsonData = json.decode(jsonString);
-      if (jsonData != null && jsonData is List) {
-        for (final item in jsonData) {
-          if (item is Map<String, dynamic>) {
-            packages.add(item);
-          }
-        }
-      }
-
-      return packages;
-    } catch (error) {
-      print('Error loading JSON: $error');
-      return [];
-    }
+  FirebaseService() {
+    // Initialize database reference
+    databaseReference = FirebaseDatabase.instance.reference();
   }
 
-  Future<Map<String, dynamic>?> fetchCartFromFirebase(String userId) async {
-    try {
-      DataSnapshot dataSnapshot = (await _database.child('users/$userId/cart').once()) as DataSnapshot;
+  final DatabaseReference _cartReference =
 
-      // Check if dataSnapshot.value is not null and is of type Map
-      if (dataSnapshot.value != null && dataSnapshot.value is Map) {
-        Map<String, dynamic> cartData = Map<String, dynamic>.from(dataSnapshot.value as Map);
-        return cartData;
-      }
+  FirebaseDatabase.instance.reference().child('carts');
+  final DatabaseReference _database = FirebaseDatabase.instance.reference();
 
-      return null;
-    } catch (error) {
-      print('Error in fetchCartFromFirebase: $error');
-      return null;
-    }
+  Future<List<Map<String, dynamic>>> getBasicPackages() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+    await FirebaseFirestore.instance.collection('model').get();
+
+    return querySnapshot.docs.map((doc) => doc.data()).toList();
   }
 
-
-
-  Future<void> updateCartData(String userId, List<Map<String, dynamic>> updatedItems) async {
+  Future<void> addToCart(List<CartItem> items, String userId) async {
     try {
-      await _database.child('users/$userId/cart').update({
-        'items': updatedItems,
+      // Convert CartItem objects to a map
+      Map<String, dynamic> itemsMap = {};
+      items.forEach((item) {
+        itemsMap[item.id] = {
+          'category': item.category,
+          'name': item.name,
+          'price': item.price,
+        };
       });
-    } catch (error) {
-      print('Error in updateCartData: $error');
-      // Handle error as needed
-    }
-  }
 
-  Future<void> createCart(String userId, List<Map<String, dynamic>> cartItems) async {
-    try {
-      await _database.child('users/$userId/cart').set({
-        'items': cartItems,
-      });
+      // Add items to the user's cart in the database
+      await _cartReference.child(userId).set(itemsMap);
     } catch (error) {
-      print('Error in createCart: $error');
+      print('Error in addToCart: $error');
       // Handle error as needed
     }
   }
